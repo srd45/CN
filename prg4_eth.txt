@@ -1,35 +1,25 @@
-PROGRAM - 6
-
-Module 4-1
-
-Implement an Ethernet LAN using n nodes and set multiple traffic nodes and plot congestion
-window for different source / destination.
-
-# create the new simulator along with trace file and nam file
-set ns [new Simulator]
+// create the new simulator along with trace file and nam file
+set ns [new Simulator] 
 set tf [open lab3.tr w]
 $ns trace-all $tf
 set nf [open lab3.nam w]
 $ns namtrace-all $nf
-
-# create nodes
-set n0 [$ns node]
-set n1 [$ns node]
-set n2 [$ns node]
+//create a node
+set n0 [$ns node] 
+set n1 [$ns node] 
+set n2 [$ns node] 
 set n3 [$ns node]
-
-# make a lan connection for nodes created
+//make a lan connection for nodes created
 $ns make-lan "$n0 $n1 $n2 $n3" 10Mb 10ms LL Queue/DropTail Mac/802_3
-
-# make nodes TCP agents and connect to FTP applications
-set tcp0 [new Agent/TCP]
-$ns attach-agent $n0 $tcp0
-set ftp0 [new Application/FTP]
-$ftp0 attach-agent $tcp0
-set sink3 [new Agent/TCPSink]
-$ns attach-agent $n3 $sink3
-$ns connect $tcp0 $sink3
-
+// make the node as tcp and connect to the FTP application
+set tcp0 [new Agent/TCP] // tcp agent creation
+$ns attach-agent $n0 $tcp0 //make n0 as source node
+set ftp0 [new Application/FTP] // ftp application creation
+$ftp0 attach-agent $tcp0 //attach ftp with tcp
+set sink3 [new Agent/TCPSink] //create the destination node
+$ns attach-agent $n3 $sink3 // make n3 as destination node
+$ns connect $tcp0 $sink3 connect source node and destination nde
+// same as above procedure
 set tcp2 [new Agent/TCP]
 $ns attach-agent $n2 $tcp2
 set ftp2 [new Application/FTP]
@@ -37,36 +27,24 @@ $ftp2 attach-agent $tcp2
 set sink1 [new Agent/TCPSink]
 $ns attach-agent $n1 $sink1
 $ns connect $tcp2 $sink1
-
-# create trace files and attach to TCP agents
+//create the two files file1.tr and file2.tr and attach to the tcp
 set file1 [open file1.tr w]
 $tcp0 attach $file1
 $tcp0 trace cwnd_
-$tcp0 set maxcwnd_ 10
-
+$tcp0 set maxcwnd_ 10 // set the maximum congestion window size as 10
 set file2 [open file2.tr w]
 $tcp2 attach $file2
 $tcp2 trace cwnd_
-$tcp2 set maxcwnd_ 10
-
-# Procedure to process the trace files and generate xgraph plots
-proc processTrace {} {
-    exec xgraph file1.tr -t "TCP0 Congestion Window" -x "Time (s)" -y "CWND (bytes)" &
-    exec xgraph file2.tr -t "TCP2 Congestion Window" -x "Time (s)" -y "CWND (bytes)" &
+$tcp2 set maxcwnd_ 10 // set the maximum congestion window size as 10
+proc finish { } { 
+global nf tf ns
+$ns flush-trace
+exec nam lab3.nam & 
+close $nf
+close $tf 
+exit 0
 }
-
-# Procedure to finish the simulation
-proc finish {} {
-    global nf tf ns
-    $ns flush-trace
-    exec nam lab3.nam &
-    close $nf
-    close $tf
-    processTrace
-    exit 0
-}
-
-# FTP application start and end times
+//ftp application start and end time
 $ns at 0.1 "$ftp0 start"
 $ns at 1.5 "$ftp0 stop"
 $ns at 2 "$ftp0 start"
@@ -79,18 +57,14 @@ $ns at 5.0 "finish"
 $ns run
 
 
-
-
-
-AWK file
-
+AWK FILE
 BEGIN{
 #include <stdio.h>
 }
 {
-if($6=="cwnd_") 
+if($6=="cwnd_") //if 6th column value is cwnd_ then fetch column 1 and column 7 value
 printf("%f\t%f\n",$1,$7);
-}
+} 
 END{
 puts "DONE";
 }
