@@ -62,3 +62,11 @@ count++; // if yes increment the variable by one
 END{
 printf("The Total no of Packets Dropped due to Congestion : %d\n\n", count);
 }
+
+
+commands:
+
+gedit prg3nodes.tcl
+gedit prg1.awk
+ns prg3nodes.tcl
+awk -f prg1.awk prg3nodes.tr
