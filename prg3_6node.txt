@@ -64,6 +64,8 @@ exit 0
 }
 $ns at 1.0 "finish"
 $ns run
+
+
 AWK Scrip : 2.awk
 BEGIN{
 #include<stdio.h> 
@@ -76,3 +78,10 @@ count++; //if true count value is incremented by one each time
 END{
 printf("The Total no of Packets Dropped due to Congestion : %d\n\n", count);
 }
+
+commands:
+
+gedit 6nodes.tcl
+gedit 6nodes.awk
+ns 6nodes.tcl
+awk -f 6nodes.awk 6nodes.tr
